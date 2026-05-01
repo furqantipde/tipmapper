@@ -1,0 +1,11 @@
+{
+  "background_color": "#000000",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "tipcurrency",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "currency",
+  "start_url": "/tipmapper",
+  "theme_color": "#ffffff"
+}
