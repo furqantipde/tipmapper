@@ -1,699 +1,867 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-<title>TipMapper</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TipCurrency v2</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #09090c;
-    --surface: #111117;
-    --card: #18181f;
-    --card2: #1f1f28;
-    --accent: #8b74fa;
-    --accent2: #b99dff;
-    --accent-glow: rgba(139,116,250,0.18);
-    --border: rgba(255,255,255,0.06);
-    --border2: rgba(139,116,250,0.22);
-    --text: #ede9ff;
-    --muted: #6b6880;
-    --muted2: #9490a8;
-    --user-bub: #241f40;
-    --ai-bub: #18181f;
-    --danger: #f87171;
-  }
-
-  html, body {
-    height: 100%;
-    background: var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'DM Sans', sans-serif;
-    color: var(--text);
-    overflow: hidden;
-  }
-
-  /* Phone shell */
-  .phone {
-    width: 390px;
-    height: 844px;
-    background: var(--surface);
-    border-radius: 44px;
-    border: 1.5px solid var(--border2);
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.6), 0 40px 120px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.05);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    position: relative;
-  }
-
-  /* Notch */
-  .notch {
-    position: absolute;
-    top: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 120px;
-    height: 32px;
-    background: var(--bg);
-    border-radius: 20px;
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-  .notch-cam { width: 10px; height: 10px; border-radius: 50%; background: #1a1a22; border: 1.5px solid #2a2a35; }
-  .notch-mic { width: 40px; height: 5px; border-radius: 3px; background: #1a1a22; }
-
-  /* Status bar */
-  .statusbar {
-    padding: 16px 24px 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: var(--muted2);
-    flex-shrink: 0;
-    margin-top: 36px;
-  }
-  .status-right { display: flex; gap: 8px; align-items: center; }
-  .signal { display: flex; gap: 2px; align-items: flex-end; }
-  .signal-bar { width: 3px; background: var(--muted2); border-radius: 1px; }
-  .signal-bar:nth-child(1){ height: 4px; }
-  .signal-bar:nth-child(2){ height: 7px; }
-  .signal-bar:nth-child(3){ height: 10px; }
-  .signal-bar:nth-child(4){ height: 13px; }
-  .battery {
-    width: 20px; height: 11px;
-    border: 1.5px solid var(--muted2);
-    border-radius: 3px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    padding: 1.5px;
-  }
-  .battery::after {
-    content: '';
-    position: absolute;
-    right: -5px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 5px;
-    background: var(--muted2);
-    border-radius: 0 1px 1px 0;
-  }
-  .battery-fill { width: 70%; height: 100%; background: var(--muted2); border-radius: 1.5px; }
-
-  /* Top bar */
-  .topbar {
-    padding: 10px 20px 12px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-    background: rgba(17,17,23,0.8);
-    backdrop-filter: blur(12px);
-  }
-  .back-btn {
-    width: 32px; height: 32px;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--accent2);
-    font-size: 18px;
-    cursor: pointer;
-    border-radius: 10px;
-    transition: background 0.15s;
-    flex-shrink: 0;
-  }
-  .back-btn:hover { background: var(--accent-glow); }
-
-  .avatar-wrap { position: relative; flex-shrink: 0; }
-  .avatar {
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #6d58d4, #a78bfa, #c084fc);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Space Mono', monospace;
-    font-size: 12px; font-weight: 700;
-    color: #fff;
-    box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--accent2);
-  }
-  .online-dot {
-    position: absolute;
-    bottom: 1px; right: 1px;
-    width: 9px; height: 9px;
-    border-radius: 50%;
-    background: #4ade80;
-    border: 2px solid var(--surface);
-  }
-
-  .topbar-info { flex: 1; min-width: 0; }
-  .topbar-name { font-size: 15px; font-weight: 600; color: var(--text); }
-  .topbar-sub { font-size: 11px; color: #4ade80; font-family: 'Space Mono', monospace; letter-spacing: 0.04em; }
-
-  .topbar-actions { display: flex; gap: 4px; }
-  .tb-btn {
-    width: 34px; height: 34px;
-    border-radius: 12px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    color: var(--muted2);
-    font-size: 15px;
-    transition: all 0.15s;
-  }
-  .tb-btn:hover { background: var(--accent-glow); color: var(--accent2); border-color: var(--border2); }
-
-  /* Chatbox */
-  .chatbox {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px 16px 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--card2) transparent;
-  }
-  .chatbox::-webkit-scrollbar { width: 3px; }
-  .chatbox::-webkit-scrollbar-thumb { background: var(--card2); border-radius: 3px; }
-
-  /* Date divider */
-  .date-divider {
-    display: flex; align-items: center; gap: 10px;
-    font-size: 10px; color: var(--muted);
-    font-family: 'Space Mono', monospace;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-  .date-divider::before, .date-divider::after {
-    content: ''; flex: 1;
-    height: 1px; background: var(--border);
-  }
-
-  /* Message rows */
-  .msg-row { display: flex; gap: 8px; align-items: flex-end; animation: fadeUp 0.25s ease; }
-  .msg-row.user { flex-direction: row-reverse; }
-  @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-
-  .msg-avatar {
-    width: 26px; height: 26px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #6d58d4, #a78bfa);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Space Mono', monospace;
-    font-size: 8px; font-weight: 700; color: #fff;
-    flex-shrink: 0;
-  }
-
-  .bubble-wrap { display: flex; flex-direction: column; max-width: 76%; }
-  .msg-row.user .bubble-wrap { align-items: flex-end; }
-
-  .bubble {
-    padding: 10px 14px;
-    font-size: 13.5px;
-    line-height: 1.55;
-    color: var(--text);
-    word-break: break-word;
-  }
-  .bubble.ai {
-    background: var(--ai-bub);
-    border: 1px solid var(--border);
-    border-radius: 16px 16px 16px 4px;
-  }
-  .bubble.user {
-    background: var(--user-bub);
-    border: 1px solid rgba(139,116,250,0.2);
-    border-radius: 16px 16px 4px 16px;
-  }
-  .bubble-meta {
-    display: flex; align-items: center; gap: 5px;
-    margin-top: 4px; padding: 0 2px;
-  }
-  .bubble-time { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; }
-  .bubble-tick { font-size: 10px; color: var(--accent2); }
-
-  /* Image card */
-  .img-card {
-    max-width: 76%; border-radius: 16px;
-    overflow: hidden; border: 1px solid var(--border);
-    cursor: pointer; position: relative;
-    background: var(--card);
-    animation: fadeUp 0.25s ease;
-  }
-  .img-card img { width: 220px; height: 180px; display: block; object-fit: cover; }
-  .img-overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%);
-    display: flex; align-items: flex-end; justify-content: flex-end;
-    padding: 10px;
-    opacity: 0; transition: opacity 0.2s;
-  }
-  .img-card:hover .img-overlay { opacity: 1; }
-  .img-save-btn {
-    background: rgba(139,116,250,0.85);
-    border: none; border-radius: 9px;
-    color: #fff; font-size: 11px;
-    padding: 5px 10px; cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .img-save-btn:hover { background: var(--accent); }
-
-  /* Typing indicator */
-  .typing-row { display: flex; gap: 8px; align-items: flex-end; }
-  .typing-bubble {
-    background: var(--ai-bub);
-    border: 1px solid var(--border);
-    border-radius: 16px 16px 16px 4px;
-    padding: 12px 16px;
-    display: flex; gap: 4px; align-items: center;
-  }
-  .typing-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%; background: var(--accent);
-    animation: blink 1.2s infinite;
-  }
-  .typing-dot:nth-child(2){ animation-delay: 0.2s; }
-  .typing-dot:nth-child(3){ animation-delay: 0.4s; }
-  @keyframes blink { 0%,60%,100%{ opacity:0.3; transform:scale(0.85); } 30%{ opacity:1; transform:scale(1); } }
-
-  /* Quick chips */
-  .chips-wrap {
-    padding: 8px 16px 0;
-    display: flex; gap: 6px;
-    overflow-x: auto; scrollbar-width: none;
-    flex-shrink: 0;
-  }
-  .chips-wrap::-webkit-scrollbar { display: none; }
-  .chip {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 6px 12px;
-    font-size: 11.5px;
-    color: var(--muted2);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.15s;
-    flex-shrink: 0;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .chip:hover {
-    border-color: var(--border2);
-    color: var(--accent2);
-    background: var(--accent-glow);
-  }
-
-  /* Input area */
-  .input-area {
-    padding: 10px 16px 20px;
-    background: rgba(17,17,23,0.95);
-    border-top: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .input-row {
-    display: flex; align-items: flex-end; gap: 8px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 22px;
-    padding: 8px 8px 8px 16px;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .input-row:focus-within {
-    border-color: var(--border2);
-    box-shadow: 0 0 0 3px var(--accent-glow);
-  }
-  .chat-input {
-    flex: 1; background: transparent;
-    border: none; outline: none;
-    font-size: 13.5px; color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    resize: none; min-height: 22px; max-height: 88px;
-    line-height: 1.5;
-  }
-  .chat-input::placeholder { color: var(--muted); }
-  .input-btns { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
-  .img-cmd-btn {
-    background: var(--card2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--muted2);
-    font-size: 11px;
-    padding: 5px 8px;
-    cursor: pointer;
-    font-family: 'Space Mono', monospace;
-    transition: all 0.15s;
-  }
-  .img-cmd-btn:hover { background: var(--accent-glow); color: var(--accent2); border-color: var(--border2); }
-  .send-btn {
-    width: 36px; height: 36px;
-    border-radius: 50%; border: none;
-    background: linear-gradient(135deg, #7c6dfa, #b99dff);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; flex-shrink: 0;
-    box-shadow: 0 2px 10px rgba(139,116,250,0.35);
-    transition: opacity 0.15s, transform 0.1s;
-  }
-  .send-btn:active { transform: scale(0.93); }
-  .send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-  .send-btn svg { width: 15px; height: 15px; fill: #fff; }
-
-  /* Fullscreen image overlay */
-  .fs-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.92);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    z-index: 999; padding: 24px;
-    animation: fadeIn 0.2s ease;
-  }
-  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-  .fs-overlay img {
-    max-width: 100%; max-height: 75vh;
-    border-radius: 16px; object-fit: contain;
-    box-shadow: 0 20px 80px rgba(0,0,0,0.7);
-  }
-  .fs-actions { display: flex; gap: 12px; margin-top: 20px; }
-  .fs-btn {
-    background: var(--card);
-    border: 1px solid var(--border2);
-    border-radius: 12px;
-    color: var(--text);
-    font-size: 13px;
-    padding: 9px 20px;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    transition: all 0.15s;
-  }
-  .fs-btn:hover { background: var(--accent-glow); color: var(--accent2); }
-  .fs-btn.primary { background: var(--accent); color: #fff; border-color: transparent; }
-  .fs-btn.primary:hover { background: var(--accent2); }
-  .fs-close {
-    position: absolute; top: 20px; right: 20px;
-    width: 36px; height: 36px;
-    border-radius: 50%; background: var(--card);
-    border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; color: var(--muted2); font-size: 16px;
-    transition: all 0.15s;
-  }
-  .fs-close:hover { background: var(--accent-glow); color: var(--danger); }
-
-  /* Error bubble */
-  .bubble.error { border-color: rgba(248,113,113,0.3); color: var(--danger); font-size: 13px; }
+:root{--bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a26;--card:rgba(22,22,34,0.7);--card-solid:#1c1c2e;--border:#2a2a3e;--fg:#f0ece4;--fg2:#9a96a6;--muted:#5c586a;--accent:#e8a838;--accent2:#f0c060;--green:#34d399;--red:#f87171;--blue:#60a5fa}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:#050508;color:var(--fg);overflow:hidden;height:100dvh;width:100vw;display:flex;justify-content:center;align-items:center}
+.phone-frame{width:100%;max-width:430px;height:100dvh;max-height:932px;background:var(--bg);position:relative;overflow:hidden;display:flex;flex-direction:column}
+@media(min-width:500px){.phone-frame{border-radius:40px;border:2px solid var(--border);height:90dvh;box-shadow:0 0 80px rgba(232,168,56,0.08),0 0 200px rgba(0,0,0,0.6)}}
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 24px 4px;font-size:12px;font-weight:600;color:var(--fg2);flex-shrink:0;z-index:10}
+.pages-wrapper{flex:1;overflow:hidden;position:relative}
+.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:0 20px 110px;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .3s,transform .3s;scrollbar-width:none;z-index:1}
+.page::-webkit-scrollbar{display:none}
+.page.active{opacity:1;transform:translateY(0);pointer-events:all}
+.bottom-nav{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,var(--bg) 70%,transparent);padding:6px 8px 18px;display:flex;justify-content:space-around;align-items:center;z-index:100}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--muted);font-size:10px;font-weight:600;cursor:pointer;transition:color .25s;padding:6px 10px;position:relative}
+.nav-item i{font-size:19px;transition:transform .25s,color .25s}
+.nav-item.active{color:var(--accent)}.nav-item.active i{transform:scale(1.15)}
+.nav-item.active::before{content:'';position:absolute;top:-4px;width:20px;height:3px;border-radius:2px;background:var(--accent)}
+.section-title{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--fg2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.section-title .act{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--accent);text-transform:none;letter-spacing:0;cursor:pointer;background:none;border:none}
+.card{background:var(--card);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px}
+.home-header{padding-top:6px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:flex-start}
+.home-header .left .greeting{font-size:13px;color:var(--fg2)}
+.home-header .left h1{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;margin-top:1px}
+.home-header .left h1 span{color:var(--accent)}
+.icon-btn{width:40px;height:40px;border-radius:12px;background:var(--card);border:1px solid var(--border);color:var(--fg2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;transition:border-color .2s;flex-shrink:0}
+.icon-btn:active{border-color:var(--accent)}
+.icon-btn .dot{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--red)}
+.quick-convert{background:linear-gradient(135deg,#1e1e30,#2a1f10);border:1px solid rgba(232,168,56,0.2);border-radius:22px;padding:20px;margin-bottom:18px;position:relative;overflow:hidden;cursor:pointer;transition:transform .2s}
+.quick-convert::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(232,168,56,0.12),transparent 70%)}
+.quick-convert:active{transform:scale(0.98)}
+.qc-label{font-size:11px;color:var(--fg2);margin-bottom:6px;font-weight:500}
+.qc-row{display:flex;align-items:center;gap:10px}
+.qc-flag{font-size:28px}.qc-amount{font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;flex:1}
+.qc-result{margin-top:14px;padding-top:14px;border-top:1px solid rgba(232,168,56,0.15);display:flex;align-items:center;gap:10px}
+.qc-result-amount{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:600;color:var(--accent2)}
+.qc-result-code{font-size:12px;color:var(--fg2);margin-left:auto}
+.multi-compare{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mc-item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer;transition:transform .2s,border-color .2s}
+.mc-item:active{transform:scale(0.96);border-color:var(--accent)}
+.mc-flag{font-size:22px;display:block;margin-bottom:4px}
+.mc-val{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc-code{font-size:10px;color:var(--fg2);display:block;margin-top:2px}
+.trending-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;margin:0 -20px;padding-left:20px;padding-right:20px}
+.trending-scroll::-webkit-scrollbar{display:none}
+.trend-card{min-width:148px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;cursor:pointer;transition:transform .2s,border-color .2s;flex-shrink:0;position:relative}
+.trend-card:active{transform:scale(0.97);border-color:var(--accent)}
+.tc-fav{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:4px;transition:color .2s}
+.tc-fav.active{color:var(--accent)}
+.tc-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.tc-flag{font-size:22px}.tc-pair{font-size:13px;font-weight:600}
+.tc-rate{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700}
+.tc-change{font-size:11px;font-weight:600;margin-top:4px}
+.tc-change.up{color:var(--green)}.tc-change.down{color:var(--red)}
+.convert-header{text-align:center;padding-top:6px;margin-bottom:20px}
+.convert-header h2{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700}
+.convert-header p{font-size:12px;color:var(--fg2);margin-top:2px}
+.currency-input-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:18px;margin-bottom:4px;transition:border-color .2s}
+.currency-input-card:focus-within{border-color:var(--accent)}
+.cic-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.cic-label{font-size:11px;color:var(--fg2);font-weight:500;text-transform:uppercase;letter-spacing:1px}
+.currency-select{display:flex;align-items:center;gap:7px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:7px 12px;cursor:pointer;transition:border-color .2s}
+.currency-select:active{border-color:var(--accent)}
+.cs-flag{font-size:20px}.cs-code{font-size:13px;font-weight:700}.cs-arrow{font-size:9px;color:var(--muted);margin-left:2px}
+.cic-input{width:100%;background:none;border:none;outline:none;font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;color:var(--fg);padding:0}
+.cic-input::placeholder{color:var(--muted)}
+.swap-btn-wrap{display:flex;justify-content:center;margin:-4px 0;position:relative;z-index:10}
+.swap-btn{width:44px;height:44px;border-radius:50%;background:var(--accent);border:4px solid var(--bg);color:var(--bg);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .3s;box-shadow:0 4px 20px rgba(232,168,56,0.3)}
+.swap-btn:active{transform:rotate(180deg) scale(0.9)}
+.chart-wrap{margin:10px 0;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px}
+.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.chart-header .ch-title{font-size:13px;font-weight:600}
+.chart-periods{display:flex;gap:4px}
+.chart-periods button{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--fg2);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.chart-periods button.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.chart-canvas{width:100%;height:90px;display:block}
+.fee-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+.fee-label{font-size:12px;color:var(--fg2);display:flex;align-items:center;gap:6px}
+.fee-label i{color:var(--accent);font-size:14px}
+.toggle-switch{width:44px;height:24px;border-radius:12px;background:var(--bg3);border:1px solid var(--border);cursor:pointer;position:relative;transition:background .3s;flex-shrink:0}
+.toggle-switch.on{background:var(--accent);border-color:var(--accent)}
+.toggle-switch::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--fg);transition:transform .3s}
+.toggle-switch.on::after{transform:translateX(20px)}
+.fee-slider-wrap{max-height:0;overflow:hidden;transition:max-height .3s}
+.fee-slider-wrap.open{max-height:60px}
+.fee-slider{display:flex;align-items:center;gap:10px;padding:8px 0}
+.fee-slider input[type=range]{flex:1;accent-color:var(--accent);height:4px}
+.fee-val{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:var(--accent);min-width:36px;text-align:right}
+.convert-result-card{background:linear-gradient(135deg,rgba(232,168,56,0.08),rgba(232,168,56,0.02));border:1px solid rgba(232,168,56,0.2);border-radius:18px;padding:18px;margin-top:10px;text-align:center}
+.cr-label{font-size:11px;color:var(--fg2);margin-bottom:4px}
+.cr-amount{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:var(--accent2)}
+.cr-rate{font-size:12px;color:var(--fg2);margin-top:6px}.cr-rate span{color:var(--accent);font-weight:600}
+.cr-fee-note{font-size:10px;color:var(--red);margin-top:6px;display:none}
+.cr-actions{display:flex;gap:8px;margin-top:12px;justify-content:center}
+.cr-actions button{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:12px;font-weight:600;color:var(--fg2);cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;font-family:'DM Sans',sans-serif}
+.cr-actions button:active{border-color:var(--accent);color:var(--accent)}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}
+.numpad-btn{height:50px;border-radius:14px;background:var(--bg3);border:1px solid var(--border);color:var(--fg);font-size:19px;font-weight:600;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:background .15s,transform .1s;display:flex;align-items:center;justify-content:center}
+.numpad-btn:active{transform:scale(0.94);background:var(--card-solid)}
+.rates-header{padding-top:6px;margin-bottom:14px}
+.rates-header h2{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700}
+.rates-header p{font-size:12px;color:var(--fg2);margin-top:2px}
+.search-bar{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:11px 16px;margin-bottom:12px;transition:border-color .2s}
+.search-bar:focus-within{border-color:var(--accent)}
+.search-bar i{color:var(--muted);font-size:13px}
+.search-bar input{flex:1;background:none;border:none;outline:none;color:var(--fg);font-size:13px;font-family:'DM Sans',sans-serif}
+.search-bar input::placeholder{color:var(--muted)}
+.rate-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.rate-item:last-child{border-bottom:none}
+.rate-item:active{opacity:.7}
+.ri-flag{font-size:26px;width:38px;text-align:center}
+.ri-info{flex:1}.ri-name{font-size:13px;font-weight:600}.ri-code{font-size:10px;color:var(--fg2);margin-top:1px}
+.ri-right{text-align:right}.ri-rate{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700}
+.ri-change{font-size:10px;font-weight:600;margin-top:2px}
+.rate-list-wrap{overflow-y:auto;scrollbar-width:none}.rate-list-wrap::-webkit-scrollbar{display:none}
+.alert-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.al-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.al-icon.up-icon{background:rgba(52,211,153,0.15);color:var(--green)}
+.al-icon.down-icon{background:rgba(248,113,113,0.15);color:var(--red)}
+.al-info{flex:1;min-width:0}.al-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.al-sub{font-size:10px;color:var(--fg2);margin-top:1px}
+.al-delete{background:none;border:none;color:var(--red);font-size:13px;cursor:pointer;padding:6px}
+.profile-header{text-align:center;padding-top:6px;margin-bottom:20px}
+.profile-avatar{width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#d4882a);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px;font-weight:800;color:var(--bg);font-family:'Space Grotesk',sans-serif;box-shadow:0 4px 30px rgba(232,168,56,0.3);position:relative}
+.edit-badge{position:absolute;bottom:0;right:0;width:26px;height:26px;border-radius:50%;background:var(--bg3);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--accent);cursor:pointer}
+.profile-name{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700}
+.profile-tag{font-size:13px;color:var(--accent);font-weight:600;margin-top:2px}
+.profile-email{font-size:12px;color:var(--fg2);margin-top:2px}
+.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.ps-item{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 8px;text-align:center}
+.ps-num{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:var(--accent)}
+.ps-label{font-size:10px;color:var(--fg2);margin-top:3px}
+.profile-menu-item{display:flex;align-items:center;gap:12px;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:7px;cursor:pointer;transition:border-color .2s,transform .15s}
+.profile-menu-item:active{transform:scale(0.98);border-color:var(--accent)}
+.pmi-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.pmi-icon.gold{background:rgba(232,168,56,0.15);color:var(--accent)}
+.pmi-icon.green{background:rgba(52,211,153,0.15);color:var(--green)}
+.pmi-icon.red{background:rgba(248,113,113,0.15);color:var(--red)}
+.pmi-icon.blue{background:rgba(96,165,250,0.15);color:var(--blue)}
+.pmi-text{flex:1;min-width:0}.pt-title{font-size:13px;font-weight:600}.pt-sub{font-size:10px;color:var(--fg2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pmi-arrow{color:var(--muted);font-size:11px;flex-shrink:0}
+.version-tag{text-align:center;font-size:10px;color:var(--muted);margin-top:16px;padding-bottom:10px}
+.modal-overlay{position:absolute;inset:0;z-index:200;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);display:flex;flex-direction:column;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal-sheet{background:var(--bg2);border-radius:24px 24px 0 0;border-top:1px solid var(--border);max-height:75%;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1)}
+.modal-overlay.show .modal-sheet{transform:translateY(0)}
+.modal-handle{width:40px;height:4px;border-radius:2px;background:var(--muted);margin:12px auto 0}
+.modal-title{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;padding:14px 20px 6px}
+.modal-search{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:9px 14px;margin:6px 20px 10px}
+.modal-search i{color:var(--muted);font-size:12px}
+.modal-search input{flex:1;background:none;border:none;outline:none;color:var(--fg);font-size:13px}
+.modal-search input::placeholder{color:var(--muted)}
+.modal-list{flex:1;overflow-y:auto;padding:0 20px 20px;scrollbar-width:none}
+.modal-list::-webkit-scrollbar{display:none}
+.modal-currency-item{display:flex;align-items:center;gap:12px;padding:11px 8px;border-radius:12px;cursor:pointer}
+.modal-currency-item:active{background:rgba(232,168,56,0.1)}
+.mci-flag{font-size:24px}.mci-info{flex:1}.mci-name{font-size:13px;font-weight:600}.mci-code{font-size:11px;color:var(--fg2)}
+.tip-content{padding:20px}
+.tip-section{margin-bottom:16px}
+.tip-section label{font-size:11px;color:var(--fg2);text-transform:uppercase;letter-spacing:1px;font-weight:600;display:block;margin-bottom:8px}
+.tip-input-row{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.tip-input-row:focus-within{border-color:var(--accent)}
+.tip-input-row i{color:var(--muted);font-size:14px}
+.tip-input-row input{flex:1;background:none;border:none;outline:none;color:var(--fg);font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700}
+.tip-input-row input::placeholder{color:var(--muted);font-size:16px}
+.tip-presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.tip-preset{padding:7px 14px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);color:var(--fg);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.tip-preset.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.tip-results{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.trc{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center}
+.trc-label{font-size:10px;color:var(--fg2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.trc-val{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--accent2)}
+.trc-sub{font-size:11px;color:var(--fg2);margin-top:4px}
+.alert-content{padding:20px}
+.alert-pair-row{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.alert-pair-select{flex:1;display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 12px;cursor:pointer;font-size:13px;font-weight:600}
+.alert-pair-select:active{border-color:var(--accent)}
+.alert-arrow{color:var(--muted);font-size:14px}
+.alert-target-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--fg);font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;outline:none;margin-bottom:14px}
+.alert-target-input:focus{border-color:var(--accent)}
+.alert-dir-btns{display:flex;gap:8px;margin-bottom:18px}
+.alert-dir-btn{flex:1;padding:12px;border-radius:12px;background:var(--bg3);border:1px solid var(--border);color:var(--fg2);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;font-family:'DM Sans',sans-serif}
+.alert-dir-btn.sel.up{background:rgba(52,211,153,0.15);color:var(--green);border-color:var(--green)}
+.alert-dir-btn.sel.down{background:rgba(248,113,113,0.15);color:var(--red);border-color:var(--red)}
+.set-alert-btn{width:100%;padding:14px;border-radius:14px;background:var(--accent);border:none;color:var(--bg);font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+.set-alert-btn:active{opacity:.85}
+.fab{position:absolute;bottom:82px;right:20px;width:52px;height:52px;border-radius:16px;background:var(--accent);border:none;color:var(--bg);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:90;box-shadow:0 4px 24px rgba(232,168,56,0.4);transition:transform .2s}
+.fab:active{transform:scale(.92)}
+.toast{position:absolute;top:56px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--card-solid);border:1px solid var(--accent);border-radius:14px;padding:10px 18px;font-size:12px;font-weight:600;color:var(--accent);z-index:500;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;white-space:nowrap;box-shadow:0 8px 30px rgba(0,0,0,0.4)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:all}
+.empty-state{text-align:center;padding:24px 20px;color:var(--muted)}
+.empty-state i{font-size:28px;margin-bottom:8px;display:block}
+.empty-state p{font-size:12px}
+.bg-blob{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
+.blob1{width:200px;height:200px;background:rgba(232,168,56,0.06);top:-50px;right:-60px}
+.blob2{width:160px;height:160px;background:rgba(232,168,56,0.04);bottom:100px;left:-40px}
+.history-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.history-item:last-child{border-bottom:none}
+.hi-flags{display:flex;align-items:center;gap:4px;font-size:16px;width:46px}
+.hi-details{flex:1;min-width:0}.hi-amount{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hi-time{font-size:10px;color:var(--fg2)}
+.hi-result{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;color:var(--accent);text-align:right}
+.fav-pair-item{display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:12px;margin-bottom:6px;cursor:pointer}
+.fav-pair-item:active{opacity:.7}
+.fpi-flags{font-size:18px}.fpi-name{flex:1;font-size:12px;font-weight:600}.fpi-rate{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:var(--fg2)}
+.fpi-remove{background:none;border:none;color:var(--red);font-size:12px;cursor:pointer;padding:6px}
+.clear-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:4px 12px;font-size:10px;font-weight:600;color:var(--fg2);cursor:pointer;font-family:'DM Sans',sans-serif}
+.clear-btn:active{border-color:var(--red);color:var(--red)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
+<div class="phone-frame" id="app">
+<div class="bg-blob blob1"></div>
+<div class="bg-blob blob2"></div>
+<div class="status-bar"><span id="statusTime">9:41</span><span><i class="fas fa-signal" style="margin-right:5px"></i><i class="fas fa-wifi" style="margin-right:5px"></i><i class="fas fa-battery-full"></i></span></div>
+<div class="pages-wrapper">
 
-<div class="phone">
-
-  <!-- Notch -->
-  <div class="notch">
-    <div class="notch-mic"></div>
-    <div class="notch-cam"></div>
+<!-- HOME -->
+<div class="page active" id="pageHome">
+  <div class="home-header">
+    <div class="left"><p class="greeting" id="greeting">Good morning</p><h1>Tip<span>Currency</span></h1></div>
+    <button class="icon-btn" onclick="showToast('No new notifications')" aria-label="Notifications"><i class="fas fa-bell"></i><span class="dot"></span></button>
   </div>
+  <div class="quick-convert" onclick="goConvert()">
+    <div class="qc-label">Quick Convert</div>
+    <div class="qc-row"><span class="qc-flag" id="qcFromFlag"></span><span class="qc-amount" id="qcFromAmount"></span></div>
+    <div class="qc-result"><span class="qc-flag" id="qcToFlag"></span><span class="qc-result-amount" id="qcToAmount"></span><span class="qc-result-code" id="qcToCode"></span></div>
+  </div>
+  <div class="section-title">Compare in 6 Currencies <button class="act" onclick="goConvert()">Convert <i class="fas fa-arrow-right" style="font-size:9px"></i></button></div>
+  <div class="multi-compare" id="multiCompare"></div>
+  <div style="margin-top:18px">
+    <div class="section-title">Trending Pairs</div>
+    <div class="trending-scroll" id="trendingScroll"></div>
+  </div>
+  <div style="margin-top:18px">
+    <div class="section-title">Recent <button class="clear-btn" onclick="clearHistory()">Clear</button></div>
+    <div id="recentList"></div>
+  </div>
+</div>
 
-  <!-- Status bar -->
-  <div class="statusbar">
-    <span id="clock">9:41</span>
-    <div class="status-right">
-      <div class="signal">
-        <div class="signal-bar"></div>
-        <div class="signal-bar"></div>
-        <div class="signal-bar"></div>
-        <div class="signal-bar"></div>
+<!-- CONVERT -->
+<div class="page" id="pageConvert">
+  <div class="convert-header"><h2>Convert</h2><p>Select currencies and enter amount</p></div>
+  <div class="currency-input-card">
+    <div class="cic-top"><span class="cic-label">From</span><div class="currency-select" onclick="openModal('from')" aria-label="Source currency"><span class="cs-flag" id="fromFlag"></span><span class="cs-code" id="fromCode"></span><i class="fas fa-chevron-down cs-arrow"></i></div></div>
+    <input class="cic-input" id="fromInput" type="text" inputmode="decimal" placeholder="0" oninput="handleFromInput(this)" aria-label="Amount">
+  </div>
+  <div class="swap-btn-wrap"><button class="swap-btn" onclick="swapCurrencies()" aria-label="Swap"><i class="fas fa-arrow-down"></i></button></div>
+  <div class="currency-input-card">
+    <div class="cic-top"><span class="cic-label">To</span><div class="currency-select" onclick="openModal('to')" aria-label="Target currency"><span class="cs-flag" id="toFlag"></span><span class="cs-code" id="toCode"></span><i class="fas fa-chevron-down cs-arrow"></i></div></div>
+    <div class="cic-input" id="toDisplay" style="color:var(--accent2);cursor:default"></div>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-header"><span class="ch-title">Rate Trend</span><div class="chart-periods"><button class="active" onclick="setChartPeriod(7,this)">7D</button><button onclick="setChartPeriod(30,this)">30D</button><button onclick="setChartPeriod(90,this)">90D</button></div></div>
+    <canvas class="chart-canvas" id="rateChart"></canvas>
+  </div>
+  <div class="card" style="padding:12px 16px">
+    <div class="fee-row"><span class="fee-label"><i class="fas fa-percent"></i> Transfer Fee</span><div class="toggle-switch" id="feeToggle" onclick="toggleFee()" role="switch" aria-label="Toggle fee"></div></div>
+    <div class="fee-slider-wrap" id="feeSliderWrap"><div class="fee-slider"><input type="range" min="0.1" max="5" step="0.1" value="1.5" id="feeSlider" oninput="updateFee()" aria-label="Fee"><span class="fee-val" id="feeVal">1.5%</span></div></div>
+  </div>
+  <div class="convert-result-card">
+    <div class="cr-label">Conversion Result</div>
+    <div class="cr-amount" id="crAmount"></div>
+    <div class="cr-rate">1 <span id="crRateFrom">USD</span> = <span id="crRateVal"></span> <span id="crRateTo">PKR</span></div>
+    <div class="cr-fee-note" id="crFeeNote"></div>
+    <div class="cr-actions">
+      <button onclick="copyResult()"><i class="fas fa-copy"></i> Copy</button>
+      <button onclick="saveConversion()"><i class="fas fa-bookmark"></i> Save</button>
+      <button onclick="shareResult()"><i class="fas fa-share-nodes"></i> Share</button>
+    </div>
+  </div>
+  <div class="numpad">
+    <button class="numpad-btn" onclick="numpadPress('7')">7</button>
+    <button class="numpad-btn" onclick="numpadPress('8')">8</button>
+    <button class="numpad-btn" onclick="numpadPress('9')">9</button>
+    <button class="numpad-btn" onclick="numpadPress('4')">4</button>
+    <button class="numpad-btn" onclick="numpadPress('5')">5</button>
+    <button class="numpad-btn" onclick="numpadPress('6')">6</button>
+    <button class="numpad-btn" onclick="numpadPress('1')">1</button>
+    <button class="numpad-btn" onclick="numpadPress('2')">2</button>
+    <button class="numpad-btn" onclick="numpadPress('3')">3</button>
+    <button class="numpad-btn" onclick="numpadPress('.')">.</button>
+    <button class="numpad-btn" onclick="numpadPress('0')">0</button>
+    <button class="numpad-btn" onclick="numpadPress('del')"><i class="fas fa-delete-left"></i></button>
+  </div>
+</div>
+
+<!-- RATES -->
+<div class="page" id="pageRates">
+  <div class="rates-header"><h2>Live Rates</h2><p>Based on USD — rates tick every 4s</p></div>
+  <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Search currency..." id="rateSearch" oninput="filterRates()" aria-label="Search"></div>
+  <div class="section-title" style="margin-bottom:8px">Active Alerts <button style="background:var(--accent);border:none;border-radius:8px;padding:4px 10px;font-size:10px;font-weight:700;color:var(--bg);cursor:pointer;font-family:'DM Sans',sans-serif" onclick="openAlertModal()"><i class="fas fa-plus" style="margin-right:3px"></i>New</button></div>
+  <div id="alertsList"></div>
+  <div class="section-title" style="margin-top:14px">All Currencies</div>
+  <div class="rate-list-wrap" id="rateListWrap" style="max-height:calc(100dvh - 380px)"></div>
+</div>
+
+<!-- PROFILE -->
+<div class="page" id="pageProfile">
+  <div class="profile-header">
+    <div class="profile-avatar">TC<div class="edit-badge" onclick="showToast('Profile updated')"><i class="fas fa-pen"></i></div></div>
+    <div class="profile-name">tipde2025</div>
+    <div class="profile-tag">www.tipde.top</div>
+    <div class="profile-email">c tipde2025</div>
+  </div>
+  <div class="profile-stats">
+    <div class="ps-item"><div class="ps-num" id="statConv">0</div><div class="ps-label">Conversions</div></div>
+    <div class="ps-item"><div class="ps-num" id="statCurr">0</div><div class="ps-label">Currencies</div></div>
+    <div class="ps-item"><div class="ps-num" id="statFav">0</div><div class="ps-label">Favorites</div></div>
+  </div>
+  <div class="section-title">Favorite Pairs</div>
+  <div id="favList"></div>
+  <div class="section-title" style="margin-top:14px">History <button class="clear-btn" onclick="clearHistory()">Clear All</button></div>
+  <div class="card" style="padding:4px 16px;max-height:180px;overflow-y:auto;scrollbar-width:none"><div id="historyList"></div></div>
+  <div class="section-title" style="margin-top:14px">Settings</div>
+  <div id="profileMenu"></div>
+  <div class="version-tag">TipCurrency v2.4.1 — tipde2025 | www.tipde.top</div>
+</div>
+</div>
+
+<button class="fab" onclick="openTipModal()" aria-label="Tip Calculator"><i class="fas fa-receipt"></i></button>
+
+<nav class="bottom-nav" aria-label="Navigation">
+  <button class="nav-item active" data-page="pageHome" onclick="switchPage('pageHome',this)"><i class="fas fa-house"></i><span>Home</span></button>
+  <button class="nav-item" data-page="pageConvert" onclick="switchPage('pageConvert',this)"><i class="fas fa-arrow-right-arrow-left"></i><span>Convert</span></button>
+  <button class="nav-item" data-page="pageRates" onclick="switchPage('pageRates',this)"><i class="fas fa-chart-line"></i><span>Rates</span></button>
+  <button class="nav-item" data-page="pageProfile" onclick="switchPage('pageProfile',this)"><i class="fas fa-user"></i><span>Profile</span></button>
+</nav>
+
+<!-- Currency Picker Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle">Select Currency</div>
+    <div class="modal-search"><i class="fas fa-search"></i><input type="text" placeholder="Search..." id="modalSearchInput" oninput="filterModalList()" aria-label="Search"></div>
+    <div class="modal-list" id="modalList"></div>
+  </div>
+</div>
+
+<!-- Tip Calculator Modal -->
+<div class="modal-overlay" id="tipOverlay" onclick="closeTipModal(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()" style="max-height:85%">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Tip Calculator</div>
+    <div class="tip-content">
+      <div class="tip-section">
+        <label>Bill Amount</label>
+        <div class="tip-input-row"><i class="fas fa-receipt"></i><input type="text" id="tipBillInput" inputmode="decimal" placeholder="0.00" oninput="calcTip()" value="50"></div>
       </div>
-      <span>WiFi</span>
-      <div class="battery"><div class="battery-fill"></div></div>
-    </div>
-  </div>
-
-  <!-- Top bar -->
-  <div class="topbar">
-    <div class="back-btn">&#8249;</div>
-    <div class="avatar-wrap">
-      <div class="avatar">TM</div>
-      <div class="online-dot"></div>
-    </div>
-    <div class="topbar-info">
-      <div class="topbar-name">TipMapper</div>
-      <div class="topbar-sub">● online</div>
-    </div>
-    <div class="topbar-actions">
-      <div class="tb-btn" title="Search">⌕</div>
-      <div class="tb-btn" title="More">⋯</div>
-    </div>
-  </div>
-
-  <!-- Chat -->
-  <div class="chatbox" id="chatbox">
-    <div class="date-divider">Today</div>
-    <div class="msg-row">
-      <div class="msg-avatar">TM</div>
-      <div class="bubble-wrap">
-        <div class="bubble ai">Hey! I'm TipMapper ✦<br>Chat with me naturally — or use <b>/image</b> followed by a description to generate images.</div>
-        <div class="bubble-meta"><span class="bubble-time" id="init-time"></span></div>
+      <div class="tip-section">
+        <label>Tip Percentage</label>
+        <div class="tip-presets" id="tipPresets">
+          <button class="tip-preset" onclick="setTipPct(10,this)">10%</button>
+          <button class="tip-preset active" onclick="setTipPct(15,this)">15%</button>
+          <button class="tip-preset" onclick="setTipPct(18,this)">18%</button>
+          <button class="tip-preset" onclick="setTipPct(20,this)">20%</button>
+          <button class="tip-preset" onclick="setTipPct(25,this)">25%</button>
+        </div>
+      </div>
+      <div class="tip-section">
+        <label>Split Between</label>
+        <div class="tip-input-row"><i class="fas fa-users"></i><input type="text" id="tipSplitInput" inputmode="numeric" placeholder="1" oninput="calcTip()" value="1"></div>
+      </div>
+      <div class="tip-results" id="tipResults">
+        <div class="trc"><div class="trc-label">Tip Amount</div><div class="trc-val" id="trcTip">$7.50</div></div>
+        <div class="trc"><div class="trc-label">Total</div><div class="trc-val" id="trcTotal">$57.50</div></div>
+        <div class="trc"><div class="trc-label">Per Person</div><div class="trc-val" id="trcPerson">$57.50</div></div>
+        <div class="trc"><div class="trc-label">Tip Each</div><div class="trc-val" id="trcTipEach">$7.50</div></div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Quick chips -->
-  <div class="chips-wrap">
-    <div class="chip" onclick="quickSend('Tell me a fun fact')">✦ fun fact</div>
-    <div class="chip" onclick="quickSend('/image a glowing galaxy purple nebula')">🌌 galaxy</div>
-    <div class="chip" onclick="quickSend('Write me a short poem')">✍ poem</div>
-    <div class="chip" onclick="quickSend('/image neon cyberpunk city rain night')">🌆 neon city</div>
-    <div class="chip" onclick="quickSend('/image a cute cat in a space suit')">🐱 space cat</div>
-  </div>
-
-  <!-- Input -->
-  <div class="input-area">
-    <div class="input-row">
-      <textarea class="chat-input" id="chatInput" placeholder="Message or /image ..." rows="1"></textarea>
-      <div class="input-btns">
-        <button class="img-cmd-btn" onclick="insertImageCmd()">/img</button>
-        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-        </button>
+<!-- Alert Setter Modal -->
+<div class="modal-overlay" id="alertOverlay" onclick="closeAlertModal(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()" style="max-height:80%">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Set Rate Alert</div>
+    <div class="alert-content">
+      <div class="alert-pair-row">
+        <div class="alert-pair-select" onclick="openModal('alertFrom')" id="alertFromSel"><span id="alertFromFlag">🇺🇸</span> <span id="alertFromCode">USD</span></div>
+        <span class="alert-arrow"><i class="fas fa-arrow-right"></i></span>
+        <div class="alert-pair-select" onclick="openModal('alertTo')" id="alertToSel"><span id="alertToFlag">🇵🇰</span> <span id="alertToCode">PKR</span></div>
       </div>
+      <input class="alert-target-input" type="text" id="alertTargetInput" inputmode="decimal" placeholder="Target rate..." value="280">
+      <div class="alert-dir-btns">
+        <button class="alert-dir-btn sel up" id="alertDirUp" onclick="setAlertDir('up')"><i class="fas fa-arrow-trend-up"></i> Goes Above</button>
+        <button class="alert-dir-btn" id="alertDirDown" onclick="setAlertDir('down')"><i class="fas fa-arrow-trend-down"></i> Goes Below</button>
+      </div>
+      <button class="set-alert-btn" onclick="createAlert()">Create Alert</button>
     </div>
   </div>
+</div>
 
+<div class="toast" id="toast"></div>
 </div>
 
 <script>
-  const LLM_API = 'https://backend.buildpicoapps.com/aero/run/llm-api?pk=v1-Z0FBQUFBQnA5RW5qMHBPR0syNW9SVlBJbkdrZFZ1UE9PRE1RX1FEeXREMDlzUUZIZGdZZDMxWU1JVm52dzk4R1lETjh6bjY3el9VMmxvd1h3VWc2Z0Jod2RHZEZybk05LVE9PQ==';
-  const IMG_API = 'https://backend.buildpicoapps.com/aero/run/image-generation-api?pk=v1-Z0FBQUFBQnA5RW5qMHBPR0syNW9SVlBJbkdrZFZ1UE9PRE1RX1FEeXREMDlzUUZIZGdZZDMxWU1JVm52dzk4R1lETjh6bjY3el9VMmxvd1h3VWc2Z0Jod2RHZEZybk05LVE9PQ==';
+// ===== CURRENCY DATA (accurate rates vs USD) =====
+const currencies=[
+{code:'USD',name:'US Dollar',flag:'🇺🇸',symbol:'$',rate:1},
+{code:'PKR',name:'Pakistani Rupee',flag:'🇵🇰',symbol:'₨',rate:278.50},
+{code:'INR',name:'Indian Rupee',flag:'🇮🇳',symbol:'₹',rate:83.47},
+{code:'EUR',name:'Euro',flag:'🇪🇺',symbol:'€',rate:0.9234},
+{code:'GBP',name:'British Pound',flag:'🇬🇧',symbol:'£',rate:0.7912},
+{code:'JPY',name:'Japanese Yen',flag:'🇯🇵',symbol:'¥',rate:154.32},
+{code:'CAD',name:'Canadian Dollar',flag:'🇨🇦',symbol:'C$',rate:1.3678},
+{code:'AUD',name:'Australian Dollar',flag:'🇦🇺',symbol:'A$',rate:1.5312},
+{code:'CHF',name:'Swiss Franc',flag:'🇨🇭',symbol:'Fr',rate:0.8845},
+{code:'CNY',name:'Chinese Yuan',flag:'🇨🇳',symbol:'¥',rate:7.2456},
+{code:'SAR',name:'Saudi Riyal',flag:'🇸🇦',symbol:'﷼',rate:3.7500},
+{code:'AED',name:'UAE Dirham',flag:'🇦🇪',symbol:'د.إ',rate:3.6725},
+{code:'TRY',name:'Turkish Lira',flag:'🇹🇷',symbol:'₺',rate:32.15},
+{code:'KRW',name:'South Korean Won',flag:'🇰🇷',symbol:'₩',rate:1365.20},
+{code:'SGD',name:'Singapore Dollar',flag:'🇸🇬',symbol:'S$',rate:1.3421},
+{code:'MYR',name:'Malaysian Ringgit',flag:'🇲🇾',symbol:'RM',rate:4.7120},
+{code:'THB',name:'Thai Baht',flag:'🇹🇭',symbol:'฿',rate:36.12},
+{code:'BDT',name:'Bangladeshi Taka',flag:'🇧🇩',symbol:'৳',rate:110.50},
+{code:'NGN',name:'Nigerian Naira',flag:'🇳🇬',symbol:'₦',rate:1580.00},
+{code:'ZAR',name:'South African Rand',flag:'🇿🇦',symbol:'R',rate:18.42},
+{code:'BRL',name:'Brazilian Real',flag:'🇧🇷',symbol:'R$',rate:4.97},
+{code:'MXN',name:'Mexican Peso',flag:'🇲🇽',symbol:'Mex$',rate:17.15},
+{code:'RUB',name:'Russian Ruble',flag:'🇷🇺',symbol:'₽',rate:92.45},
+{code:'PHP',name:'Philippine Peso',flag:'🇵🇭',symbol:'₱',rate:56.78},
+{code:'IDR',name:'Indonesian Rupiah',flag:'🇮🇩',symbol:'Rp',rate:15890},
+{code:'QAR',name:'Qatari Riyal',flag:'🇶🇦',symbol:'﷼',rate:3.6400},
+{code:'KWD',name:'Kuwaiti Dinar',flag:'🇰🇼',symbol:'د.ك',rate:0.3074},
+{code:'BHD',name:'Bahraini Dinar',flag:'🇧🇭',symbol:'ب.د',rate:0.3770},
+{code:'OMR',name:'Omani Rial',flag:'🇴🇲',symbol:'ر.ع.',rate:0.3845},
+{code:'EGP',name:'Egyptian Pound',flag:'🇪🇬',symbol:'E£',rate:48.50},
+{code:'AFN',name:'Afghan Afghani',flag:'🇦🇫',symbol:'؋',rate:71.20},
+{code:'IQD',name:'Iraqi Dinar',flag:'🇮🇶',symbol:'ع.د',rate:1310.00},
+{code:'LKR',name:'Sri Lankan Rupee',flag:'🇱🇰',symbol:'₨',rate:312.50},
+{code:'NPR',name:'Nepalese Rupee',flag:'🇳🇵',symbol:'रू',rate:133.08},
+{code:'MMK',name:'Myanmar Kyat',flag:'🇲🇲',symbol:'K',rate:2100.00},
+{code:'GHS',name:'Ghanaian Cedi',flag:'🇬🇭',symbol:'₵',rate:12.85},
+{code:'KES',name:'Kenyan Shilling',flag:'🇰🇪',symbol:'KSh',rate:153.20},
+{code:'TND',name:'Tunisian Dinar',flag:'🇹🇳',symbol:'د.ت',rate:3.12},
+{code:'MAD',name:'Moroccan Dirham',flag:'🇲🇦',symbol:'د.م.',rate:10.05}
+];
 
-  const chatbox = document.getElementById('chatbox');
-  const chatInput = document.getElementById('chatInput');
-  const sendBtn = document.getElementById('sendBtn');
+// Store base rates so ticks don't drift too far
+const baseRates={};
+currencies.forEach(c=>{baseRates[c.code]=c.rate});
 
-  // Clock
-  function updateClock() {
-    const now = new Date();
-    document.getElementById('clock').textContent = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+const changes={};
+currencies.forEach(c=>{changes[c.code]=(Math.random()-0.45)*3.5});
+
+// ===== STATE =====
+let fromCurrency='USD', toCurrency='PKR', currentAmount='1000';
+let modalTarget='from';
+let feeEnabled=false, feePct=1.5, tipPct=15;
+let alertFrom='USD', alertTo='PKR', alertDir='up';
+let recentConversions=[
+  {from:'USD',to:'PKR',amount:500,result:139250,time:'2 min ago'},
+  {from:'EUR',to:'INR',amount:200,result:18082,time:'15 min ago'},
+  {from:'GBP',to:'USD',amount:1000,result:1263.88,time:'1 hr ago'}
+];
+let favoritePairs=['USD/PKR','USD/INR','EUR/GBP'];
+let alerts=[
+  {from:'USD',to:'PKR',target:280,dir:'up'},
+  {from:'EUR',to:'USD',target:1.1,dir:'down'}
+];
+let conversionCount=3;
+let chartPeriod=7;
+
+// ===== HELPERS =====
+function getCurrency(code){return currencies.find(c=>c.code===code)}
+function fmt(n,d){d=d||2;if(Math.abs(n)>=1e6)return(n/1e6).toFixed(2)+'M';if(Math.abs(n)>=1e4)return n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});return n.toFixed(d)}
+function convert(amount,from,to){var fc=getCurrency(from),tc=getCurrency(to);if(!fc||!tc)return 0;return(amount/fc.rate)*tc.rate}
+function ratePair(from,to){var fc=getCurrency(from),tc=getCurrency(to);return fc&&tc?tc.rate/fc.rate:0}
+
+// ===== TIME & GREETING =====
+function updateTime(){var n=new Date();document.getElementById('statusTime').textContent=n.getHours()+':'+String(n.getMinutes()).padStart(2,'0')}
+updateTime();setInterval(updateTime,30000);
+(function(){var h=new Date().getHours();document.getElementById('greeting').textContent=h<12?'Good morning':h<17?'Good afternoon':'Good evening'})();
+
+// ===== PAGE SWITCHING (fixed) =====
+function switchPage(id,btn){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});
+  document.getElementById(id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  // Refresh page content
+  if(id==='pageRates')renderRates();
+  if(id==='pageProfile')renderProfile();
+  if(id==='pageConvert'){updateConversion();drawChart()}
+  if(id==='pageHome')renderHome();
+}
+function goConvert(){switchPage('pageConvert',document.querySelector('[data-page="pageConvert"]'))}
+
+// ===== CONVERSION =====
+function updateConversion(){
+  var amount=parseFloat(currentAmount)||0;
+  var result=convert(amount,fromCurrency,toCurrency);
+  var fc=getCurrency(fromCurrency),tc=getCurrency(toCurrency);
+  var rp=ratePair(fromCurrency,toCurrency);
+
+  // Apply fee
+  var feeDeduct=0, finalResult=result;
+  if(feeEnabled&&feePct>0){feeDeduct=result*(feePct/100);finalResult=result-feeDeduct}
+
+  // Convert page
+  document.getElementById('fromFlag').textContent=fc.flag;
+  document.getElementById('fromCode').textContent=fc.code;
+  document.getElementById('toFlag').textContent=tc.flag;
+  document.getElementById('toCode').textContent=tc.code;
+  document.getElementById('toDisplay').textContent=fmt(finalResult);
+  document.getElementById('crAmount').textContent=tc.symbol+' '+fmt(finalResult);
+  document.getElementById('crRateFrom').textContent=fc.code;
+  document.getElementById('crRateTo').textContent=tc.code;
+  document.getElementById('crRateVal').textContent=fmt(rp,4);
+
+  var feeNote=document.getElementById('crFeeNote');
+  if(feeEnabled&&feePct>0){feeNote.style.display='block';feeNote.textContent='After '+feePct+'% fee deduction ('+fc.symbol+' '+fmt(feeDeduct)+')'}else{feeNote.style.display='none'}
+
+  // Quick convert on home
+  document.getElementById('qcFromFlag').textContent=fc.flag;
+  document.getElementById('qcFromAmount').textContent=fmt(amount,0)+' '+fc.code;
+  document.getElementById('qcToFlag').textContent=tc.flag;
+  document.getElementById('qcToAmount').textContent=fmt(finalResult);
+  document.getElementById('qcToCode').textContent=tc.code;
+}
+
+function handleFromInput(el){
+  var v=el.value.replace(/[^0-9.]/g,'');
+  var parts=v.split('.');if(parts.length>2)v=parts[0]+'.'+parts.slice(1).join('');
+  currentAmount=v;el.value=v;updateConversion();
+}
+function numpadPress(k){
+  if(k==='del'){currentAmount=currentAmount.slice(0,-1)}
+  else if(k==='.'){if(!currentAmount.includes('.'))currentAmount+='.'}
+  else{if(currentAmount==='0')currentAmount=k;else if(currentAmount.length<12)currentAmount+=k}
+  document.getElementById('fromInput').value=currentAmount;updateConversion();
+}
+function swapCurrencies(){var t=fromCurrency;fromCurrency=toCurrency;toCurrency=t;updateConversion();drawChart();showToast('Currencies swapped')}
+
+// ===== FEE =====
+function toggleFee(){
+  feeEnabled=!feeEnabled;
+  document.getElementById('feeToggle').classList.toggle('on',feeEnabled);
+  document.getElementById('feeSliderWrap').classList.toggle('open',feeEnabled);
+  updateConversion();
+}
+function updateFee(){feePct=parseFloat(document.getElementById('feeSlider').value);document.getElementById('feeVal').textContent=feePct+'%';updateConversion()}
+
+// ===== COPY / SAVE / SHARE =====
+function copyResult(){
+  var amount=parseFloat(currentAmount)||0;
+  var result=convert(amount,fromCurrency,toCurrency);
+  if(feeEnabled)result=result*(1-feePct/100);
+  var text=amount+' '+fromCurrency+' = '+fmt(result)+' '+toCurrency;
+  if(navigator.clipboard){navigator.clipboard.writeText(text).then(function(){showToast('Copied to clipboard')})}
+  else{showToast('Copied: '+fmt(result)+' '+toCurrency)}
+}
+function saveConversion(){
+  var amount=parseFloat(currentAmount)||0;
+  var result=convert(amount,fromCurrency,toCurrency);
+  if(feeEnabled)result=result*(1-feePct/100);
+  var now=new Date();
+  var timeStr=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+  recentConversions.unshift({from:fromCurrency,to:toCurrency,amount:amount,result:result,time:timeStr});
+  if(recentConversions.length>20)recentConversions.pop();
+  conversionCount++;renderHome();renderProfile();
+  showToast('Conversion saved');
+}
+function shareResult(){
+  var amount=parseFloat(currentAmount)||0;
+  var result=convert(amount,fromCurrency,toCurrency);
+  var text=amount+' '+fromCurrency+' = '+fmt(result)+' '+toCurrency+' via TipCurrency v2';
+  if(navigator.share){navigator.share({title:'TipCurrency',text:text}).catch(function(){})}
+  else{showToast('Shared: '+fmt(result)+' '+toCurrency)}
+}
+
+// ===== CHART =====
+function generateChartData(days){
+  var rp=ratePair(fromCurrency,toCurrency);
+  var data=[];var val=rp;
+  for(var i=0;i<days;i++){
+    val+=(Math.random()-0.48)*rp*0.008;
+    val=Math.max(rp*0.9,Math.min(rp*1.1,val));
+    data.push(val);
   }
-  updateClock(); setInterval(updateClock, 30000);
-  document.getElementById('init-time').textContent = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  data[days-1]=rp; // end at current rate
+  return data;
+}
+function drawChart(){
+  var canvas=document.getElementById('rateChart');
+  if(!canvas)return;
+  var ctx=canvas.getContext('2d');
+  var dpr=window.devicePixelRatio||1;
+  var rect=canvas.getBoundingClientRect();
+  canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;
+  ctx.scale(dpr,dpr);
+  var w=rect.width,h=rect.height;
+  ctx.clearRect(0,0,w,h);
 
-  // Auto-grow textarea
-  chatInput.addEventListener('input', () => {
-    chatInput.style.height = 'auto';
-    chatInput.style.height = Math.min(chatInput.scrollHeight, 88) + 'px';
+  var data=generateChartData(chartPeriod);
+  var mn=Math.min.apply(null,data),mx=Math.max.apply(null,data);
+  var range=mx-mn||1;
+  var padY=10;
+
+  // Grid lines
+  ctx.strokeStyle='rgba(42,42,62,0.5)';ctx.lineWidth=0.5;
+  for(var g=0;g<4;g++){
+    var gy=padY+(h-padY*2)*(g/3);
+    ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(w,gy);ctx.stroke();
+  }
+
+  // Line
+  var grad=ctx.createLinearGradient(0,0,w,0);
+  grad.addColorStop(0,'rgba(232,168,56,0.3)');grad.addColorStop(1,'rgba(232,168,56,1)');
+  ctx.strokeStyle=grad;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.lineCap='round';
+  ctx.beginPath();
+  for(var i=0;i<data.length;i++){
+    var x=(i/(data.length-1))*w;
+    var y=padY+(1-(data[i]-mn)/range)*(h-padY*2);
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // Fill under
+  var fillGrad=ctx.createLinearGradient(0,0,0,h);
+  fillGrad.addColorStop(0,'rgba(232,168,56,0.15)');fillGrad.addColorStop(1,'rgba(232,168,56,0)');
+  ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();
+  ctx.fillStyle=fillGrad;ctx.fill();
+
+  // End dot
+  var lastX=w,lastY=padY+(1-(data[data.length-1]-mn)/range)*(h-padY*2);
+  ctx.beginPath();ctx.arc(lastX,lastY,4,0,Math.PI*2);ctx.fillStyle='#e8a838';ctx.fill();
+  ctx.beginPath();ctx.arc(lastX,lastY,7,0,Math.PI*2);ctx.strokeStyle='rgba(232,168,56,0.3)';ctx.lineWidth=2;ctx.stroke();
+}
+function setChartPeriod(days,btn){
+  chartPeriod=days;
+  document.querySelectorAll('.chart-periods button').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');drawChart();
+}
+
+// ===== CURRENCY MODAL =====
+function openModal(target){
+  modalTarget=target;
+  var title='Select Currency';
+  if(target==='from')title='Source Currency';
+  else if(target==='to')title='Target Currency';
+  else if(target==='alertFrom')title='Alert — From Currency';
+  else if(target==='alertTo')title='Alert — To Currency';
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalSearchInput').value='';
+  renderModalList(currencies);
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function closeModal(e){if(e&&e.target!==document.getElementById('modalOverlay'))return;document.getElementById('modalOverlay').classList.remove('show')}
+function renderModalList(list){
+  document.getElementById('modalList').innerHTML=list.map(function(c){
+    return '<div class="modal-currency-item" onclick="selectCurrency(\''+c.code+'\')"><span class="mci-flag">'+c.flag+'</span><div class="mci-info"><div class="mci-name">'+c.name+'</div><div class="mci-code">'+c.code+'</div></div></div>';
+  }).join('');
+}
+function filterModalList(){
+  var q=document.getElementById('modalSearchInput').value.toLowerCase();
+  renderModalList(currencies.filter(function(c){return c.name.toLowerCase().indexOf(q)!==-1||c.code.toLowerCase().indexOf(q)!==-1}));
+}
+function selectCurrency(code){
+  if(modalTarget==='from'){if(code===toCurrency)toCurrency=fromCurrency;fromCurrency=code}
+  else if(modalTarget==='to'){if(code===fromCurrency)fromCurrency=toCurrency;toCurrency=code}
+  else if(modalTarget==='alertFrom'){alertFrom=code;document.getElementById('alertFromFlag').textContent=getCurrency(code).flag;document.getElementById('alertFromCode').textContent=code;document.getElementById('modalOverlay').classList.remove('show');return}
+  else if(modalTarget==='alertTo'){alertTo=code;document.getElementById('alertToFlag').textContent=getCurrency(code).flag;document.getElementById('alertToCode').textContent=code;document.getElementById('modalOverlay').classList.remove('show');return}
+  updateConversion();drawChart();
+  document.getElementById('modalOverlay').classList.remove('show');
+  showToast(getCurrency(code).flag+' '+code+' selected');
+}
+
+// ===== HOME PAGE =====
+function renderHome(){
+  // Multi compare
+  var compareCodes=['PKR','INR','EUR','GBP','AED','SAR'];
+  var amount=parseFloat(currentAmount)||0;
+  document.getElementById('multiCompare').innerHTML=compareCodes.map(function(code){
+    var c=getCurrency(code);var r=convert(amount,fromCurrency,code);
+    return '<div class="mc-item" onclick="quickPair(\''+fromCurrency+'\',\''+code+'\')"><span class="mc-flag">'+c.flag+'</span><span class="mc-val">'+fmt(r)+'</span><span class="mc-code">'+c.code+'</span></div>';
+  }).join('');
+
+  // Trending
+  var pairs=[['USD','PKR'],['USD','INR'],['EUR','GBP'],['USD','JPY'],['GBP','PKR'],['USD','AED'],['EUR','INR'],['USD','SAR']];
+  document.getElementById('trendingScroll').innerHTML=pairs.map(function(p){
+    var fc=getCurrency(p[0]),tc=getCurrency(p[1]),rp=tc.rate/fc.rate;
+    var ch=(Math.random()-0.45)*3;var up=ch>=0;
+    var pairKey=p[0]+'/'+p[1];var isFav=favoritePairs.indexOf(pairKey)!==-1;
+    return '<div class="trend-card" onclick="quickPair(\''+p[0]+'\',\''+p[1]+'\')"><button class="tc-fav'+(isFav?' active':'')+'" onclick="event.stopPropagation();toggleFavPair(\''+pairKey+'\',this)"><i class="fas fa-star"></i></button><div class="tc-top"><span class="tc-flag">'+fc.flag+'</span><span class="tc-pair">'+p[0]+'/'+p[1]+'</span></div><div class="tc-rate">'+fmt(rp,4)+'</div><div class="tc-change '+(up?'up':'down')+'"><i class="fas fa-caret-'+(up?'up':'down')+'" style="margin-right:3px"></i>'+(up?'+':'')+ch.toFixed(2)+'%</div></div>';
+  }).join('');
+
+  // Recent
+  renderRecent();
+  updateConversion();
+}
+function renderRecent(){
+  if(recentConversions.length===0){document.getElementById('recentList').innerHTML='<div class="empty-state"><i class="fas fa-clock-rotate-left"></i><p>No recent conversions</p></div>';return}
+  document.getElementById('recentList').innerHTML=recentConversions.slice(0,5).map(function(r){
+    var fc=getCurrency(r.from),tc=getCurrency(r.to);
+    return '<div class="card" style="padding:12px;cursor:pointer" onclick="replayConv(\''+r.from+'\',\''+r.to+'\','+r.amount+')"><div style="display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:22px">'+fc.flag+'</span><i class="fas fa-arrow-right" style="color:var(--muted);font-size:10px"></i><span style="font-size:22px">'+tc.flag+'</span></div><div style="text-align:right"><div style="font-family:Space Grotesk,sans-serif;font-size:15px;font-weight:700">'+tc.symbol+' '+fmt(r.result)+'</div><div style="font-size:10px;color:var(--fg2)">'+r.time+'</div></div></div></div>';
+  }).join('');
+}
+function quickPair(f,t){fromCurrency=f;toCurrency=t;currentAmount='1000';document.getElementById('fromInput').value='1000';updateConversion();goConvert();drawChart()}
+function replayConv(f,t,a){fromCurrency=f;toCurrency=t;currentAmount=String(a);document.getElementById('fromInput').value=currentAmount;updateConversion();goConvert();drawChart()}
+function toggleFavPair(key,btn){
+  var idx=favoritePairs.indexOf(key);
+  if(idx===-1){favoritePairs.push(key);btn.classList.add('active');showToast('Added to favorites')}
+  else{favoritePairs.splice(idx,1);btn.classList.remove('active');showToast('Removed from favorites')}
+  renderProfile();
+}
+
+// ===== RATES PAGE =====
+function renderRates(){
+  document.getElementById('rateListWrap').innerHTML=currencies.filter(function(c){return c.code!=='USD'}).map(function(c){
+    var ch=changes[c.code];var up=ch>=0;
+    return '<div class="rate-item" data-code="'+c.code+'" data-name="'+c.name.toLowerCase()+'" onclick="selectRateCurrency(\''+c.code+'\')"><span class="ri-flag">'+c.flag+'</span><div class="ri-info"><div class="ri-name">'+c.name+'</div><div class="ri-code">'+c.code+'</div></div><div class="ri-right"><div class="ri-rate">'+fmt(c.rate,4)+'</div><div class="ri-change '+(up?'up':'down')+'">'+(up?'+':'')+ch.toFixed(2)+'%</div></div></div>';
+  }).join('');
+  renderAlertsList();
+}
+function selectRateCurrency(code){toCurrency=code;fromCurrency='USD';currentAmount='1';document.getElementById('fromInput').value='1';updateConversion();goConvert();drawChart();showToast('Converting USD to '+code)}
+function filterRates(){
+  var q=document.getElementById('rateSearch').value.toLowerCase();
+  document.querySelectorAll('.rate-item').forEach(function(el){
+    var c=el.dataset.code.toLowerCase(),n=el.dataset.name;
+    el.style.display=(c.indexOf(q)!==-1||n.indexOf(q)!==-1)?'flex':'none';
   });
-  chatInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-  });
+}
 
-  function getTime() {
-    return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+// ===== ALERTS =====
+function renderAlertsList(){
+  var el=document.getElementById('alertsList');
+  if(alerts.length===0){el.innerHTML='<div class="empty-state"><i class="fas fa-bell-slash"></i><p>No active alerts</p></div>';return}
+  el.innerHTML=alerts.map(function(a,i){
+    var isUp=a.dir==='up';
+    return '<div class="alert-card"><div class="al-icon '+(isUp?'up-icon':'down-icon')+'"><i class="fas fa-arrow-trend-'+(isUp?'up':'down')+'"></i></div><div class="al-info"><div class="al-title">'+a.from+'/'+a.to+' '+fmt(a.target,4)+'</div><div class="al-sub">'+(isUp?'Goes above':'Goes below')+' target rate</div></div><button class="al-delete" onclick="deleteAlert('+i+')"><i class="fas fa-trash"></i></button></div>';
+  }).join('');
+}
+function openAlertModal(){document.getElementById('alertOverlay').classList.add('show');updateAlertModalUI()}
+function closeAlertModal(e){if(e&&e.target!==document.getElementById('alertOverlay'))return;document.getElementById('alertOverlay').classList.remove('show')}
+function updateAlertModalUI(){
+  document.getElementById('alertFromFlag').textContent=getCurrency(alertFrom).flag;
+  document.getElementById('alertFromCode').textContent=alertFrom;
+  document.getElementById('alertToFlag').textContent=getCurrency(alertTo).flag;
+  document.getElementById('alertToCode').textContent=alertTo;
+  var targetRate=ratePair(alertFrom,alertTo);
+  document.getElementById('alertTargetInput').value=fmt(targetRate,2);
+}
+function setAlertDir(dir){
+  alertDir=dir;
+  document.getElementById('alertDirUp').classList.toggle('sel',dir==='up');
+  document.getElementById('alertDirUp').classList.toggle('up',dir==='up');
+  document.getElementById('alertDirDown').classList.toggle('sel',dir==='down');
+  document.getElementById('alertDirDown').classList.toggle('down',dir==='down');
+}
+function createAlert(){
+  var target=parseFloat(document.getElementById('alertTargetInput').value);
+  if(!target||target<=0){showToast('Enter a valid target rate');return}
+  alerts.push({from:alertFrom,to:alertTo,target:target,dir:alertDir});
+  document.getElementById('alertOverlay').classList.remove('show');
+  renderAlertsList();showToast('Alert created successfully');
+}
+function deleteAlert(i){alerts.splice(i,1);renderAlertsList();showToast('Alert removed')}
+
+// ===== TIP CALCULATOR =====
+function openTipModal(){document.getElementById('tipOverlay').classList.add('show');calcTip()}
+function closeTipModal(e){if(e&&e.target!==document.getElementById('tipOverlay'))return;document.getElementById('tipOverlay').classList.remove('show')}
+function setTipPct(pct,btn){
+  tipPct=pct;
+  document.querySelectorAll('.tip-preset').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');calcTip();
+}
+function calcTip(){
+  var bill=parseFloat(document.getElementById('tipBillInput').value)||0;
+  var split=parseInt(document.getElementById('tipSplitInput').value)||1;
+  if(split<1)split=1;
+  var tip=bill*(tipPct/100);
+  var total=bill+tip;
+  var perPerson=total/split;
+  var tipEach=tip/split;
+  document.getElementById('trcTip').textContent='$'+fmt(tip);
+  document.getElementById('trcTotal').textContent='$'+fmt(total);
+  document.getElementById('trcPerson').textContent='$'+fmt(perPerson);
+  document.getElementById('trcTipEach').textContent='$'+fmt(tipEach);
+}
+
+// ===== PROFILE =====
+function renderProfile(){
+  document.getElementById('statConv').textContent=conversionCount;
+  var usedCodes={};recentConversions.forEach(function(r){usedCodes[r.from]=1;usedCodes[r.to]=1});
+  document.getElementById('statCurr').textContent=Object.keys(usedCodes).length;
+  document.getElementById('statFav').textContent=favoritePairs.length;
+
+  // Favorites
+  var favEl=document.getElementById('favList');
+  if(favoritePairs.length===0){favEl.innerHTML='<div class="empty-state"><i class="fas fa-star"></i><p>No favorite pairs yet</p></div>'}
+  else{favEl.innerHTML=favoritePairs.map(function(p,i){
+    var parts=p.split('/');var fc=getCurrency(parts[0]),tc=getCurrency(parts[1]);
+    var rp=fc&&tc?fmt(tc.rate/fc.rate,4):'—';
+    return '<div class="fav-pair-item" onclick="quickPair(\''+parts[0]+'\',\''+parts[1]+'\')"><span class="fpi-flags">'+fc.flag+' '+tc.flag+'</span><span class="fpi-name">'+p+'</span><span class="fpi-rate">'+rp+'</span><button class="fpi-remove" onclick="event.stopPropagation();removeFav('+i+')"><i class="fas fa-xmark"></i></button></div>';
+  }).join('')}
+
+  // History
+  var histEl=document.getElementById('historyList');
+  if(recentConversions.length===0){histEl.innerHTML='<div class="empty-state"><i class="fas fa-clock-rotate-left"></i><p>No history</p></div>'}
+  else{histEl.innerHTML=recentConversions.map(function(r){
+    var fc=getCurrency(r.from),tc=getCurrency(r.to);
+    return '<div class="history-item"><span class="hi-flags">'+fc.flag+' <i class="fas fa-arrow-right" style="font-size:8px;color:var(--muted)"></i> '+tc.flag+'</span><div class="hi-details"><div class="hi-amount">'+fmt(r.amount,0)+' '+r.from+'</div><div class="hi-time">'+r.time+'</div></div><div class="hi-result">'+fmt(r.result)+' '+r.to+'</div></div>';
+  }).join('')}
+}
+function removeFav(i){favoritePairs.splice(i,1);renderProfile();showToast('Removed from favorites')}
+function clearHistory(){recentConversions=[];conversionCount=0;renderHome();renderProfile();showToast('History cleared')}
+
+// Profile menu
+function renderProfileMenu(){
+  var items=[
+    {icon:'fa-globe',cls:'blue',title:'Language',sub:'English'},
+    {icon:'fa-bell',cls:'green',title:'Notifications',sub:'Rate alerts active'},
+    {icon:'fa-shield-halved',cls:'gold',title:'Privacy & Security',sub:'Manage your data'},
+    {icon:'fa-circle-question',cls:'blue',title:'Help & Support',sub:'FAQs and contact'},
+    {icon:'fa-info-circle',cls:'green',title:'About TipCurrency',sub:'v2.4.1 — tipde2025'},
+    {icon:'fa-right-from-bracket',cls:'red',title:'Sign Out',sub:'Log out of your account'}
+  ];
+  document.getElementById('profileMenu').innerHTML=items.map(function(item){
+    return '<div class="profile-menu-item" onclick="handleMenu(\''+item.title+'\')"><div class="pmi-icon '+item.cls+'"><i class="fas '+item.icon+'"></i></div><div class="pmi-text"><div class="pt-title">'+item.title+'</div><div class="pt-sub">'+item.sub+'</div></div><i class="fas fa-chevron-right pmi-arrow"></i></div>';
+  }).join('');
+}
+function handleMenu(title){
+  if(title==='Sign Out')showToast('Signed out successfully');
+  else if(title==='About TipCurrency')showToast('tipde2025 — www.tipde.top');
+  else showToast(title+' — Coming soon');
+}
+
+// ===== TOAST =====
+function showToast(msg){
+  var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._tm);t._tm=setTimeout(function(){t.classList.remove('show')},2200);
+}
+
+// ===== LIVE RATE TICKS =====
+setInterval(function(){
+  for(var i=0;i<3;i++){
+    var idx=Math.floor(Math.random()*currencies.length);
+    var c=currencies[idx];if(c.code==='USD')continue;
+    var base=baseRates[c.code];
+    var drift=(Math.random()-0.5)*base*0.001;
+    c.rate=Math.max(base*0.95,Math.min(base*1.05,c.rate+drift));
+    changes[c.code]+=(Math.random()-0.5)*0.08;
   }
+  if(document.getElementById('pageRates').classList.contains('active'))renderRates();
+  updateConversion();
+},4000);
 
-  function scrollBottom() {
-    chatbox.scrollTop = chatbox.scrollHeight;
-  }
-
-  function addUserBubble(text) {
-    const row = document.createElement('div');
-    row.className = 'msg-row user';
-    const wrap = document.createElement('div');
-    wrap.className = 'bubble-wrap';
-    const bub = document.createElement('div');
-    bub.className = 'bubble user';
-    bub.textContent = text;
-    const meta = document.createElement('div');
-    meta.className = 'bubble-meta';
-    meta.innerHTML = `<span class="bubble-time">${getTime()}</span><span class="bubble-tick">✓✓</span>`;
-    wrap.appendChild(bub); wrap.appendChild(meta);
-    row.appendChild(wrap);
-    chatbox.appendChild(row);
-    scrollBottom();
-  }
-
-  function addAIBubble(text, isError=false) {
-    const row = document.createElement('div');
-    row.className = 'msg-row';
-    const av = document.createElement('div');
-    av.className = 'msg-avatar'; av.textContent = 'TM';
-    const wrap = document.createElement('div');
-    wrap.className = 'bubble-wrap';
-    const bub = document.createElement('div');
-    bub.className = 'bubble ai' + (isError ? ' error' : '');
-    bub.textContent = text;
-    const meta = document.createElement('div');
-    meta.className = 'bubble-meta';
-    meta.innerHTML = `<span class="bubble-time">${getTime()}</span>`;
-    wrap.appendChild(bub); wrap.appendChild(meta);
-    row.appendChild(av); row.appendChild(wrap);
-    chatbox.appendChild(row);
-    scrollBottom();
-  }
-
-  function addTyping() {
-    const row = document.createElement('div');
-    row.className = 'typing-row'; row.id = 'typing-row';
-    const av = document.createElement('div');
-    av.className = 'msg-avatar'; av.textContent = 'TM';
-    const bub = document.createElement('div');
-    bub.className = 'typing-bubble';
-    bub.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
-    row.appendChild(av); row.appendChild(bub);
-    chatbox.appendChild(row);
-    scrollBottom();
-  }
-
-  function removeTyping() {
-    const el = document.getElementById('typing-row');
-    if (el) el.remove();
-  }
-
-  function addImageMsg(url) {
-    const row = document.createElement('div');
-    row.className = 'msg-row';
-    const av = document.createElement('div');
-    av.className = 'msg-avatar'; av.textContent = 'TM';
-    const card = document.createElement('div');
-    card.className = 'img-card';
-    const img = document.createElement('img');
-    img.src = url; img.alt = 'Generated image';
-    const ov = document.createElement('div');
-    ov.className = 'img-overlay';
-    const saveBtn = document.createElement('button');
-    saveBtn.className = 'img-save-btn'; saveBtn.textContent = 'Save';
-    saveBtn.onclick = (e) => { e.stopPropagation(); downloadImage(url); };
-    ov.appendChild(saveBtn);
-    card.appendChild(img); card.appendChild(ov);
-    card.onclick = () => showFullscreen(url);
-    row.appendChild(av); row.appendChild(card);
-    chatbox.appendChild(row);
-    scrollBottom();
-  }
-
-  function showFullscreen(url) {
-    const ov = document.createElement('div');
-    ov.className = 'fs-overlay';
-    ov.onclick = (e) => { if(e.target===ov) ov.remove(); };
-    const img = document.createElement('img');
-    img.src = url;
-    const cl = document.createElement('div');
-    cl.className = 'fs-close'; cl.innerHTML = '✕';
-    cl.onclick = () => ov.remove();
-    const actions = document.createElement('div');
-    actions.className = 'fs-actions';
-    const dlBtn = document.createElement('button');
-    dlBtn.className = 'fs-btn primary'; dlBtn.textContent = 'Download';
-    dlBtn.onclick = () => downloadImage(url);
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'fs-btn'; closeBtn.textContent = 'Close';
-    closeBtn.onclick = () => ov.remove();
-    actions.appendChild(dlBtn); actions.appendChild(closeBtn);
-    ov.appendChild(cl); ov.appendChild(img); ov.appendChild(actions);
-    document.body.appendChild(ov);
-  }
-
-  function downloadImage(url) {
-    const a = document.createElement('a');
-    a.href = url; a.download = 'tipmapper-image.png';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  }
-
-  function setLoading(on) {
-    chatInput.disabled = on;
-    sendBtn.disabled = on;
-    if (!on) { chatInput.focus(); chatInput.style.height = 'auto'; }
-  }
-
-  async function callApi(url, prompt) {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({prompt})
-    });
-    return res.json();
-  }
-
-  async function sendMessage() {
-    const msg = chatInput.value.trim();
-    if (!msg) return;
-    chatInput.value = '';
-    addUserBubble(msg);
-    setLoading(true);
-    addTyping();
-
-    try {
-      if (/^\/(image|img)\s+/i.test(msg)) {
-        const desc = msg.replace(/^\/(image|img)\s+/i, '');
-        const data = await callApi(IMG_API, desc);
-        removeTyping();
-        if (data.status === 'success') addImageMsg(data.imageUrl);
-        else addAIBubble('Could not generate image. Please try again.', true);
-      } else {
-        const persona = "Follow instructions precisely! If the user asks to generate, create or make an image, photo, or picture by describing it, You will reply with '/image' + description. Otherwise, You will respond normally. Avoid additional explanations. ";
-        const data = await callApi(LLM_API, persona + msg);
-        removeTyping();
-        if (data.status === 'success') {
-          const text = data.text.trim();
-          if (text.toLowerCase().startsWith('/image')) {
-            const desc = text.substring(text.toLowerCase().indexOf('/image') + 6).trim();
-            addTyping();
-            const imgData = await callApi(IMG_API, desc);
-            removeTyping();
-            if (imgData.status === 'success') addImageMsg(imgData.imageUrl);
-            else addAIBubble('Image generation failed.', true);
-          } else {
-            addAIBubble(text);
-          }
-        } else {
-          addAIBubble('Something went wrong. Please try again.', true);
-        }
-      }
-    } catch(e) {
-      removeTyping();
-      addAIBubble('Network error. Please check your connection.', true);
-    }
-
-    setLoading(false);
-  }
-
-  function quickSend(text) {
-    chatInput.value = text;
-    sendMessage();
-  }
-
-  function insertImageCmd() {
-    chatInput.value = '/image ';
-    chatInput.focus();
-  }
+// ===== INIT =====
+renderHome();
+renderRates();
+renderProfile();
+renderProfileMenu();
+updateConversion();
+setTimeout(drawChart,100);
 </script>
 </body>
 </html>
